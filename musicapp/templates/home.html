@@ -1,0 +1,318 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>App music</title>
+
+    <style>
+        body{
+            height: 100%;
+            background-color: black;
+
+            }
+
+        body{
+
+
+            background: linear-gradient(
+            to top right,
+            black,
+            #0F0063,
+            #6CC4FF
+        );
+
+
+    }
+
+        .title-text2{
+            display: none;
+            }
+
+        form{
+            position: relative;
+            display: flex;
+            gap: 5em;
+            }
+
+        #search_bar{
+            flex-grow: 1;
+            height: 37px;
+            border-radius: 3em;
+            padding: 0 0 0 1em;
+            border: none;
+
+        }
+
+        #search_bar:focus{
+            border: none;
+            outline: none;
+            }
+
+        #submit{
+            display: block;
+            position: absolute;
+            right: 0;
+            height: 38px;
+            width: 4em;
+            border-radius: 0 3em 3em 0;
+            background:linear-gradient(
+                to top right,
+                #2F45FF,
+                blue,
+                white
+                );
+            border: none;
+
+
+        }
+
+        #submit:hover{
+            cursor: pointer;
+            }
+
+        #body {
+    border-top: 2px solid black;
+    border-radius: 1em;
+    height: 37.58em;
+    padding: 1em 0.3em;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4em;
+    overflow-y: auto;
+    overflow-x: hidden;
+    position: relative;
+
+    &::-webkit-scrollbar {
+        width: 0.1em;
+        height: 0.1em;
+    }
+    &::-webkit-scrollbar-thumb {
+        background-color: transparent;
+    }
+    &::-webkit-scrollbar-track {
+        background: transparent;
+    }
+    scrollbar-width: none;
+}
+        .songs{
+            border: 2px solid black;
+            height: 3.2em;
+            display: flex;
+            flex-shrink: 0;
+
+            border-radius: 0.4em;
+            background: linear-gradient(
+                to right,
+                #5157FF,
+                #5157FF,
+                #B4D4E3
+
+                );
+        }
+
+        .profile{
+            border: 2px solid black;
+            height: 3em;
+            width: 3em;
+            border-radius: 100%;
+            overflow: hidden;
+        }
+
+        .profile2{
+            height: 100%;
+            width: 100%;
+            }
+
+        .name{
+
+            height: 1em;
+            width: 3em;
+            flex-grow:1;
+            margin: auto;
+            padding: 2px;
+            overflow: hidden;
+            white-space: nowrap;
+            position: relative;
+
+        }
+
+        .download{
+            height: 2em;
+            width: 2em;
+            margin: auto;
+            border-radius: 100%;
+            color: black; padding: 0.2em 0.2em 0.2em 0.8em;
+        }
+
+        .download:hover{
+            cursor: pointer;
+        }
+
+        .start-marquee .title-text{
+            display: inline-block;
+            animation: marquee 15s linear infinite;
+            animation-delay: 2s;
+        }
+
+        .start-marquee .title-text2{
+            display: inline-block;
+            animation: marquee2 15s linear infinite;
+            animation-delay: 2s;
+        }
+
+        .name:hover .title-text{
+            animation-play-state: paused;
+        }
+        .name:hover .title-text2{
+            animation-play-state: paused;
+        }
+
+        @keyframes marquee{
+            0%{
+                transform: translateX(0%);
+            }
+            100%{
+                transform: translateX(-109%);
+
+            }
+
+        }
+
+        @keyframes marquee2{
+                    0%{
+                        transform: translateX(2%);
+                        }
+                    100%{
+                        transform: translateX(-101%);
+                        }
+                    }
+        h1{
+
+            background: linear-gradient(
+                    to right,
+                    black,
+                    #0F0063,
+                    white
+                    );
+
+                    -webkit-background-clip: text;
+                    -webkit-text-fill-color: transparent;
+                    color: #0F0063;
+                    font-weight: bold;
+        }
+
+
+
+        #downloads{
+            font-size: 2.5em;
+            position: fixed;
+            right: 0.4em;
+            bottom: 0.4em;
+            z-index: 10;
+
+        }
+    </style>
+</head>
+<body>
+
+<h1 id="h1">Music Downloader</h1>
+<div id="searchFolder">
+    <form method="post" action="{% url 'search_song' %}">
+        {% csrf_token %}
+        <input id="search_bar" type="text" placeholder="Search any song" name="search_bar" required>
+        <button id="submit" type="submit">
+            <i class="fa fa-search"></i>
+        </button>
+    </form>
+
+</div>
+<br>
+<div id="body">
+    {% if search_results %}
+    {% for result in search_results %}
+        <div class="songs">
+            <a href="{{ result.url }}">
+                <div
+    class="profile"
+    data-video-url="{{ result.url }}"
+    id="profile-{{ forloop.counter }}">
+
+    <img class="profile2" src="/static/placeholder.png" alt="Video Thumbnail">
+</div>
+            </a>
+
+            <div class="name">
+            <div class="inner-wrap">
+                <span class="title-text">
+                    {{ result.title }}
+                </span>
+
+                <span class="title-text2">
+                    {{ result.title }}
+                </span>
+            </div>
+        </div>
+            <a href="{% url 'download_song' %}?url={{ result.url }}" class="download" title="download Song">
+                    <i class="fa fa-download download"></i>
+            </a>
+
+
+        </div>
+    {% endfor %}
+    {% else %}
+        <p style="text-align: center">
+            Hello there, search and download any song you want at highest quality possible
+        </p>
+    {% endif %}
+    <i class="fa fa-cloud-download" aria-hidden="true" id="downloads"></i>
+</div>
+
+
+</body>
+<script>
+    function checkOverflowAndAnimate() {
+        const nameDivs = document.querySelectorAll('.name');
+
+        nameDivs.forEach(nameDiv => {
+            const innerWrap = nameDiv.querySelector('.inner-wrap');
+            if (innerWrap && innerWrap.scrollWidth > nameDiv.clientWidth) {
+                nameDiv.classList.add('start-marquee');
+            } else {
+                nameDiv.classList.remove('start-marquee');
+            }
+        });
+    }
+
+    window.onload = function() {
+        checkOverflowAndAnimate();
+    };
+
+   document.addEventListener('DOMContentLoaded', function() {
+    const profileContainers = document.querySelectorAll('.profile[data-video-url]');
+
+    profileContainers.forEach(containerEl => {
+        const videoUrl = containerEl.getAttribute('data-video-url');
+        const imgEl = containerEl.querySelector('.profile2');
+
+        if (videoUrl && imgEl) {
+            fetch(`{% url 'get_thumbnail_api' %}?url=${encodeURIComponent(videoUrl)}`)
+                .then(response => response.json())
+                .then(data => {
+                    const picUrl = data.pic;
+                    if (picUrl) {
+                        imgEl.src = picUrl;
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching thumbnail:', error);
+                });
+        }
+    });
+});
+</script>
+</html>
