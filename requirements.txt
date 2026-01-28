@@ -3,5 +3,6 @@ Django==6.0.1
 imageio-ffmpeg==0.6.0
 pytube==15.0.0
 sqlparse==0.5.5
-yt-dlp==2025.12.8
+yt-dlp
+gunicorn
 gunicorn
