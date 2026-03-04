@@ -7,16 +7,13 @@ from pytube import Search
 from yt_dlp import YoutubeDL
 from django.conf import settings
 
-# --- BULLETPROOF PATHING ---
-# BASE_DIR points to the folder containing manage.py
+# --- SIMPLE ABSOLUTE PATH ---
+# This looks for the file in the same folder as manage.py
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 COOKIE_PATH = os.path.join(BASE_DIR, 'youtube_cookies.txt')
-
-# This helps bypass bot detection by mimicking a real Chrome browser
 USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36'
 
 download_folder = os.path.join(settings.MEDIA_ROOT, 'downloads/music')
-FFMPEG_BIN_DIR = None
 
 def download_progress_hook(d):
     if d['status'] == 'downloading':
@@ -25,8 +22,6 @@ def download_progress_hook(d):
             percent = float(clean_percent_str)
         except ValueError:
             percent = 0
-        
-        # Accessing session from the info dict passed in download_song
         req = d.get('info', {}).get('request')
         if req:
             req.session['dl_percent'] = round(percent)
@@ -49,7 +44,6 @@ def get_thumbnail_url(video_url):
 
 def search_song(request):
     search_results = []
-    error_message = None
     if request.method == 'POST':
         search_term = request.POST.get("search_bar", "").strip()
         if search_term:
@@ -58,8 +52,8 @@ def search_song(request):
                 for video in tube_search.results[:20]:
                     search_results.append({"title": video.title, "url": video.watch_url, "pic": None})
             except Exception as e:
-                error_message = f"Search Error: {e}"
-    return render(request, "home.html", {'search_results': search_results, 'error': error_message})
+                print(f"Search Error: {e}")
+    return render(request, "home.html", {'search_results': search_results})
 
 def get_thumbnail_api(request):
     video_url = request.GET.get('url')
@@ -86,11 +80,7 @@ def download_song(request):
             'noplaylist': True,
             'writethumbnail': True,
             'progress_hooks': [custom_hook],
-            'extractor_args': {
-                'youtube': {
-                    'player_client': ['web', 'default', '-android_sdkless']
-                }
-            },
+            'extractor_args': {'youtube': {'player_client': ['web', 'default', '-android_sdkless']}},
             'postprocessors': [
                 {'key': 'FFmpegExtractAudio', 'preferredcodec': 'mp3', 'preferredquality': '192'},
                 {'key': 'FFmpegMetadata', 'add_metadata': True},
@@ -101,7 +91,6 @@ def download_song(request):
         with YoutubeDL(ydl_opts) as ydl:
             info_dict = ydl.extract_info(youtube_url, download=True)
             title = info_dict.get('title', 'Unknown')
-            # Fix: yt-dlp returns original ext, but postprocessor makes it .mp3
             final_filename = ydl.prepare_filename(info_dict)
             final_filename = os.path.splitext(final_filename)[0] + ".mp3"
             relative_path = os.path.relpath(final_filename, os.getcwd())
