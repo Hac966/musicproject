@@ -116,6 +116,7 @@ def download_song(request):
 
             ydl_opts = {
                 'format': 'bestaudio/best',
+                'cookiefile': 'youtube_cookies.txt',
                 'outtmpl': os.path.join(download_folder, '%(title)s.%(ext)s'),
                 'noplaylist': True,
                 'ffmpeg_location': FFMPEG_BIN_DIR,
@@ -164,5 +165,6 @@ def download_song(request):
             return JsonResponse({'status': 'failed', 'error': str(e)}, status=500)
 
     return JsonResponse({'status': 'error', 'error': 'No URL provided.'}, status=400)
+
 
 
