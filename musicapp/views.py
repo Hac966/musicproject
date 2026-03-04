@@ -140,6 +140,11 @@ def download_song(request):
             'key': 'EmbedThumbnail',
         },
     ],
+        'extractor_args': {
+        'youtube': {
+            'player_client': ['default', '-android_sdkless']
+        }
+    },
             }
             with YoutubeDL(ydl_opts) as ydl:
                 info_dict = ydl.extract_info(youtube_url, download=True)
@@ -165,6 +170,7 @@ def download_song(request):
             return JsonResponse({'status': 'failed', 'error': str(e)}, status=500)
 
     return JsonResponse({'status': 'error', 'error': 'No URL provided.'}, status=400)
+
 
 
 
